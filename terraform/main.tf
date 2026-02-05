@@ -21,12 +21,16 @@ data "aws_ami" "amazon_linux" {
 resource "aws_instance" "k3s_node" {
   ami           = data.aws_ami.amazon_linux.id
   instance_type = "t3.micro"
-  key_name      = "infra-dev-key" # key pair
-  vpc_security_group_ids = [aws_security_group.sg_7th_room.id] # sc
+  key_name      = "infra-dev-key"
+  vpc_security_group_ids = [aws_security_group.sg_7th_room.id]
 
   tags = {
     Name = "dev-k3s-node-01"
     Environment = "dev"
     Project = "infra-auto"
   }
+}
+
+output "public_ip" {
+  value = aws_instance.k3s_node.public_ip
 }
