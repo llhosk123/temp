@@ -18,12 +18,18 @@ data "aws_ami" "amazon_linux" {
 }
 
 # terraform resource
-# 기본 VPC 첫 번째 public subnet에 자동 배치
 resource "aws_instance" "k3s_node" {
   ami           = data.aws_ami.amazon_linux.id
   instance_type = "t3.micro"
   key_name      = "infra-dev-key"
-  vpc_security_group_ids = [aws_security_group.sg_7th_room.id]
+
+  # public subnet 중 첫 번째에 배치
+  subnet_id = data.aws_subnets.public.ids[0]
+
+  vpc_security_group_ids = [
+    aws_security_group.sg_7th_room.id,
+    aws_security_group.web-sg.id
+  ]
 
   tags = {
     Name = "dev-k3s-node-01"
