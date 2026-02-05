@@ -18,6 +18,7 @@ data "aws_ami" "amazon_linux" {
 }
 
 # terraform resource
+# 기본 VPC 첫 번째 public subnet에 자동 배치
 resource "aws_instance" "k3s_node" {
   ami           = data.aws_ami.amazon_linux.id
   instance_type = "t3.micro"
