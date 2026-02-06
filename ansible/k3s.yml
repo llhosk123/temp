@@ -1,3 +1,27 @@
-# GitHub Actions 러너 -> Playbook을 실행하는 머신
-# Ansible Playbook을 통해 EC2에 설치를 자동화하기 위해 머신에 Python + Ansible 필요
-# EC2에 Python, Ansible 설치 필요X -> 머신에서 Ansible 모듈을 사용하여 EC2에 k3s만 설치
+# EC2에 k3s 설치용 Ansible Playbook
+
+---
+- name: Install K3s on EC2
+  hosts: k3s_nodes
+  become: yes
+  gather_facts: no  # Python 없으면 fact 수집 불가
+
+  tasks:
+    - name: Ensure Python3 is installed
+      raw: |
+        if ! command -v python3 >/dev/null 2>&1; then
+          sudo dnf install -y python3
+        fi
+
+    - name: Install k3s
+      shell: curl -sfL https://get.k3s.io | sh -
+      args:
+        executable: /bin/bash
+
+    - name: Check k3s status
+      shell: sudo systemctl status k3s
+      register: k3s_status
+      ignore_errors: yes
+
+    - debug:
+        msg: "{{ k3s_status.stdout }}"
