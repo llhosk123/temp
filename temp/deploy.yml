@@ -1,0 +1,40 @@
+# GitHub Actions 러너(임시 머신)
+# 워크플로우 실행이 끝나면 삭제됨
+
+# 여기서 하는 일
+# 1. Python 설치
+# 2. Ansible 설치
+# 3. SSH 키 준비
+# 4. ansible-playbook + kubectl apply 실행
+#    -> ansible-playbook k3s.yml : EC2에 k3s 설치
+#    -> ssh + kubectl apply -f infra.yml : EC2 k3s 클러스터에 쿠버 리소스 배포
+
+name: Deploy k3s
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest # GitHub Actions 러너 OS
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Install Python3 and Ansible
+        run: |
+          sudo apt update
+          sudo apt install -y python3 python3-pip
+          pip3 install --user ansible
+
+      - name: Set up SSH key
+        run: |
+          echo "$SSH_PRIVATE_KEY" > kim-key.pem
+          chmod 400 kim-key.pem
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Run k3s Playbook
+        run: ansible-playbook -i inventory.ini k3s.yml
