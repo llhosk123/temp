@@ -33,6 +33,7 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       # aws configure (로컬) = configure-aws-credentials (CI)
+      # 환경변수로 export
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
