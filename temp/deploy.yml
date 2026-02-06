@@ -12,8 +12,8 @@
 name: Deploy k3s
 
 on:
-  push:
-    branches: [ main ]
+  #push:
+  #  branches: [ main ]
   workflow_dispatch:
 
 jobs:
