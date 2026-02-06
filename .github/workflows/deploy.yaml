@@ -32,6 +32,14 @@ jobs:
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v3
 
+      # aws configure (로컬) = configure-aws-credentials (CI)
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
       - name: Terraform Apply
         working-directory: terraform
         run: |
@@ -39,17 +47,29 @@ jobs:
           terraform apply -auto-approve
 
       - name: Get EC2 IP
-        id: tf_output
         working-directory: terraform
         run: |
-          echo "EC2_IP=$(terraform output -raw ec2_public_ip)" >> $GITHUB_ENV
+          echo "EC2_IP=$(terraform output -raw public_ip)" >> $GITHUB_ENV
+
+      - name: Prepare SSH known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${EC2_IP} >> ~/.ssh/known_hosts
+
+      - name: Create Ansible inventory
+        run: |
+          cat <<EOF > ansible/inventory.ini
+          [aws]
+          k3s-node ansible_host=${EC2_IP} ansible_user=ec2-user ansible_ssh_private_key_file=kim-key.pem
+          EOF
         
       - name: Set up SSH key
         run: |
-          echo "$SSH_PRIVATE_KEY" > kim-key.pem
-          chmod 400 kim-key.pem
+          echo "$SSH_PRIVATE_KEY" > ansible/kim-key.pem
+          chmod 400 ansible/kim-key.pem
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Run k3s Playbook
+        working-directory: ansible
         run: ansible-playbook -i inventory.ini k3s.yml
