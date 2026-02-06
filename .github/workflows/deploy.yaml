@@ -1,0 +1,14 @@
+name: Kubernetes CI/CD
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: # 수동 트리거 (테스트용)
+
+- name: Set up SSH key
+  run: |
+    echo "$SSH_PRIVATE_KEY" > kim-key.pem
+    chmod 400 kim-key.pem
+  env:
+    SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
