@@ -12,8 +12,8 @@
 name: Deploy k3s
 
 on:
-  push:
-    branches: [ main ]
+  #push:
+  #  branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -56,14 +56,6 @@ jobs:
             exit 1
           fi
           echo "EC2_IP=$EC2_IP" >> $GITHUB_ENV
-
-      - name: Wait for EC2 SSH ready
-        run: |
-          echo "Waiting for EC2 SSH to be ready..."
-          until ssh -o StrictHostKeyChecking=no -i ansible/kim-key.pem ec2-user@${EC2_IP} "echo SSH ready" > /dev/null 2>&1; do
-            echo "SSH not ready yet, retrying in 5s..."
-            sleep 5
-          done
 
       - name: Prepare SSH known_hosts
         run: |
