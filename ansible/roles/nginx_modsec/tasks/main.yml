@@ -51,7 +51,7 @@
 - name: Ensure Nginx loads ModSecurity module
   lineinfile:
     path: /etc/nginx/nginx.conf
-    insertafter: '^user '
+    insertafter: BOF  # 파일 맨 위
     line: 'load_module modules/ngx_http_modsecurity_module.so;'
     state: present
 
