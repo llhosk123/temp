@@ -1,9 +1,10 @@
 # ModSecurity 기본 설정
-# SecRuleEngine On → blocking 모드
+
+# ModSecurity blocking 모드
 SecRuleEngine On
 
+# 요청 본문 검사 활성화
 SecRequestBodyAccess On
-SecResponseBodyAccess Off
 SecRequestBodyLimit 13107200
 SecRequestBodyNoFilesLimit 131072
 SecRequestBodyInMemoryLimit 131072
@@ -11,3 +12,8 @@ SecRequestBodyLimitAction Reject
 
 # 기본 CRS 규칙 포함
 IncludeOptional /usr/share/mod_security_crs/*.conf
+
+# 간단 로깅: 위반 요청 기록
+SecAuditEngine RelevantOnly
+SecAuditLog /var/log/modsecurity/audit.log
+SecAuditLogParts ABIFHZ
