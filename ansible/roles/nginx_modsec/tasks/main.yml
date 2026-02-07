@@ -1,1 +1,53 @@
+---
+# 필수 패키지 설치
+- name: Install required packages
+  dnf:
+    name:
+      - nginx
+      - mod_security
+      - mod_security_crs
+      - curl
+    state: present
 
+# ModSecurity 활성화
+- name: Enable ModSecurity
+  copy:
+    src: /etc/modsecurity/modsecurity.conf-recommended
+    dest: /etc/modsecurity/modsecurity.conf
+    remote_src: yes
+
+- name: Set ModSecurity to blocking mode
+  replace:
+    path: /etc/modsecurity/modsecurity.conf
+    regexp: '^SecRuleEngine.*'
+    replace: 'SecRuleEngine On'
+
+# Nginx에 ModSecurity 연동 설정
+- name: Enable ModSecurity in Nginx
+  copy:
+    dest: /etc/nginx/conf.d/modsecurity.conf
+    content: |
+      load_module modules/ngx_http_modsecurity_module.so;
+      modsecurity on;
+      modsecurity_rules_file /etc/modsecurity/modsecurity.conf;
+
+# 기본 Nginx 서버 설정
+- name: Configure Nginx default site
+  copy:
+    dest: /etc/nginx/conf.d/default.conf
+    content: |
+      server {
+          listen 80;
+          server_name _;
+
+          location / {
+              return 200 "Nginx + ModSecurity WAF OK\n";
+          }
+      }
+
+# Nginx 시작
+- name: Start and enable Nginx
+  systemd:
+    name: nginx
+    state: started
+    enabled: yes
