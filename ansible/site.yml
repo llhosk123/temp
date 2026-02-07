@@ -3,7 +3,7 @@
 
 ---
 - name: Setup Infra on EC2
-- hosts: aws # inventory 그룹 이름
+  hosts: aws # inventory 그룹 이름
   become: yes # sudo 권한으로 명령 실행
   gather_facts: yes # Python 설치 후 facts(호스트 정보) 수집 가능
   roles:
