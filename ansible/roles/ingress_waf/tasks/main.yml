@@ -1,22 +1,31 @@
 # Nginx Ingress Controller + WAF (k3s 환경 / Helm 기반)
-# 실무에서는 AWS WAF를 사용하지만 프리티어가 아닌 점 때문에 'WAF 개념을 직접 이해하는 것'에 초점을 두고 Ingress Controller + ModSecurity로 진행
+# 실무에서는 AWS WAF를 사용하지만, 프리티어가 아닌 점 때문에 WAF 개념을 직접 이해하는 것에 초점을 두고 Ingress Controller + ModSecurity로 진행
 
 ---
-# Helm 존재 여부 체크
+
+# 1️⃣ Helm 존재 여부 체크
 - name: Check if helm exists
   command: which helm
   register: helm_check
   ignore_errors: yes
 
-# Helm 자동 설치 (Amazon Linux 2023 기준)
-- name: Install Helm if not present (Amazon Linux 2023)
+# 2️⃣ curl 설치 (Helm 공식 설치 스크립트용)
+- name: Ensure curl is installed
   become: yes
   dnf:
-    name: helm
+    name: curl
     state: present
+
+# 3️⃣ Helm 설치 (Amazon Linux 2023용 공식 스크립트)
+- name: Install Helm via official script if not present
+  become: yes
+  shell: |
+    curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+  args:
+    creates: /usr/local/bin/helm
   when: helm_check.rc != 0
 
-# ingress-nginx Helm repo 추가
+# 4️⃣ ingress-nginx Helm repo 추가
 - name: Add ingress-nginx helm repo
   command: >
     helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
@@ -26,7 +35,7 @@
   command: helm repo update
   changed_when: false
 
-# Nginx Ingress Controller + ModSecurity + CRS 설치
+# 5️⃣ Nginx Ingress Controller + ModSecurity + CRS 설치
 - name: Install Nginx Ingress Controller with ModSecurity WAF
   command: >
     helm upgrade --install nginx-waf ingress-nginx/ingress-nginx
@@ -40,12 +49,12 @@
     --set controller.admissionWebhooks.enabled=false
   changed_when: false
 
-# 컨트롤러 기동 대기
+# 6️⃣ 컨트롤러 기동 대기
 - name: Wait for ingress controller to be ready
   command: sleep 30
   changed_when: false
 
-# 테스트용 Self-Signed TLS Secret 생성
+# 7️⃣ 테스트용 Self-Signed TLS Secret 생성
 - name: Create self-signed TLS secret for WAF test
   shell: |
     if [ ! -f /tmp/waf.key ]; then
@@ -64,7 +73,7 @@
       --dry-run=client -o yaml | kubectl apply -f -
   changed_when: false
 
-# 모든 트래픽 WAF로 통과시키는 Catch-all Ingress
+# 8️⃣ 모든 트래픽 WAF로 통과시키는 Catch-all Ingress
 - name: Deploy WAF catch-all ingress rule
   shell: |
     cat <<EOF | kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml apply -f -
