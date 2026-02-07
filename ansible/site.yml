@@ -1,1 +1,6 @@
-
+- hosts: aws
+  become: yes
+  gather_facts: yes
+  roles:
+    - k3s
+    - nginx_modsec
