@@ -57,26 +57,32 @@ jobs:
           fi
           echo "EC2_IP=$EC2_IP" >> $GITHUB_ENV
 
+      - name: Set up SSH key
+        run: |
+          mkdir -p $HOME/.ssh
+          echo "$SSH_PRIVATE_KEY" > $HOME/.ssh/kim-key.pem
+          chmod 400 $HOME/.ssh/kim-key.pem
+          # mkdir -p ~/.ssh
+          # echo "$SSH_PRIVATE_KEY" > ~/.ssh/kim-key.pem
+          # chmod 400 ~/.ssh/kim-key.pem
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
       - name: Prepare SSH known_hosts
         run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -H ${EC2_IP} >> ~/.ssh/known_hosts
+          mkdir -p $HOME/.ssh
+          ssh-keyscan -H ${EC2_IP} >> $HOME/.ssh/known_hosts
+          # mkdir -p ~/.ssh
+          # ssh-keyscan -H ${EC2_IP} >> ~/.ssh/known_hosts
 
       - name: Create Ansible inventory
         run: |
           cat <<EOF > ansible/inventory.ini
           [aws]
-          k3s-node ansible_host=${EC2_IP} ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/kim-key.pem # 절대경로 사
+          k3s-node ansible_host=${EC2_IP} ansible_user=ec2-user ansible_ssh_private_key_file=$HOME/.ssh/kim-key.pem
+          # k3s-node ansible_host=${EC2_IP} ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/kim-key.pem # 절대경로 사용
           EOF
-
-      - name: Set up SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/kim-key.pem
-          chmod 400 ~/.ssh/kim-key.pem
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        
+          
       - name: Run k3s Playbook
         working-directory: ansible
         # run: ansible-playbook -i inventory.ini k3s.yml
