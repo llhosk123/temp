@@ -1,3 +1,5 @@
+# Amazon Linux 2023 기준
+
 ---
 # 필수 패키지 설치 전 curl 안정화
 - name: Gather installed packages
@@ -29,7 +31,8 @@
 # ModSecurity 활성화
 - name: Enable ModSecurity
   copy:
-    src: /etc/modsecurity/modsecurity.conf-recommended
+    # src: /etc/modsecurity/modsecurity.conf-recommended
+    src: /etc/httpd/modsecurity.d/modsecurity.conf-recommended # AMI마다 ModSecurity 설치 시 설정 파일 경로 다름 -> 실무에서는 대부분 AMI 하나에 맞춰서 플레이북 만듦
     dest: /etc/modsecurity/modsecurity.conf
     remote_src: yes
 
