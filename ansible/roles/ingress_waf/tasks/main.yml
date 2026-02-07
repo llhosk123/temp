@@ -2,16 +2,19 @@
 # k3s 환경 / Helm 기반
 
 ---
-- name: Check helm exists
+# Helm 존재 여부 체크
+- name: Check if helm exists
   command: which helm
   register: helm_check
   ignore_errors: yes
 
-- name: Fail if helm is not installed
-  fail:
-    msg: "Helm is not installed. Install helm before running ingress_waf role."
+# Helm 자동 설치 (Amazon Linux 2023 기준)
+- name: Install Helm if not present (Amazon Linux 2023)
+  become: yes
+  dnf:
+    name: helm
+    state: present
   when: helm_check.rc != 0
-
 
 # ingress-nginx Helm repo 추가
 - name: Add ingress-nginx helm repo
@@ -23,7 +26,6 @@
   command: helm repo update
   changed_when: false
 
-
 # Nginx Ingress Controller + ModSecurity + CRS 설치
 - name: Install Nginx Ingress Controller with ModSecurity WAF
   command: >
@@ -33,21 +35,17 @@
     --kubeconfig /etc/rancher/k3s/k3s.yaml
     --set controller.config.enable-modsecurity=true
     --set controller.config.enable-owasp-modsecurity-crs=true
-    --set controller.kind=DaemonSet
-    --set controller.hostNetwork=true
-    --set controller.dnsPolicy=ClusterFirstWithHostNet
-    --set controller.service.type=ClusterIP
+    --set controller.kind=Deployment
+    --set controller.service.type=NodePort
     --set controller.admissionWebhooks.enabled=false
   changed_when: false
-
 
 # 컨트롤러 기동 대기
 - name: Wait for ingress controller to be ready
   command: sleep 30
   changed_when: false
 
-
-# (선택) 테스트용 Self-Signed TLS Secret 생성
+# 테스트용 Self-Signed TLS Secret 생성
 - name: Create self-signed TLS secret for WAF test
   shell: |
     if [ ! -f /tmp/waf.key ]; then
@@ -66,8 +64,7 @@
       --dry-run=client -o yaml | kubectl apply -f -
   changed_when: false
 
-
-# (선택) 모든 트래픽을 WAF로 통과시키는 Catch‑all Ingress
+# 모든 트래픽 WAF로 통과시키는 Catch-all Ingress
 - name: Deploy WAF catch-all ingress rule
   shell: |
     cat <<EOF | kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml apply -f -
@@ -77,7 +74,7 @@
       name: waf-gateway
       annotations:
         nginx.ingress.kubernetes.io/enable-modsecurity: "true"
-        nginx.ingress.kubernetes.io/enable-owasp-core-rules: "true"
+        nginx.ingress.kubernetes.io/enable-owasp-modsecurity-crs: "true"
         nginx.ingress.kubernetes.io/modsecurity-snippet: |
           SecRuleEngine On
     spec:
@@ -91,8 +88,8 @@
             pathType: Prefix
             backend:
               service:
-                name: kubernetes
+                name: test-nginx
                 port:
-                  number: 443
+                  number: 80
     EOF
   changed_when: false
