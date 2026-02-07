@@ -71,6 +71,14 @@ jobs:
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      - name: Wait for SSH to be ready
+        run: |
+          for i in {1..30}; do
+            nc -zv ${EC2_IP} 22 && break
+            echo "Waiting for SSH..."
+            sleep 5
+          done
+
       - name: Prepare SSH known_hosts
         run: |
           ssh-keyscan -H ${EC2_IP} >> ~/.ssh/known_hosts
