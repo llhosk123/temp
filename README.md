@@ -1,4 +1,4 @@
-## 트러블슈팅
+## 트러블슈팅 & 정리
 [![Notion](https://img.shields.io/badge/Notion-black?style=for-the-badge&logo=notion&logoColor=white)](https://www.notion.so/300cd1e77d158071aab7da50eb155ad3)
 
 ## Actions 성공 후 k3s active, get nodes 확인 완료 (2026.02.07)
