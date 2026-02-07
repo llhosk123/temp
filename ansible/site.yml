@@ -1,5 +1,5 @@
 # 설치 순서만 적어둔 총괄 실행 파일
-# 어떤 서버에 어떤 role들을 어떤 순서로 실행할지만 정의
+# 어떤 서버에 어떤 role들을 어떤 순서로 실행할지만 정의 -> 실제 작업은 전부 roles/*/tasks/main.yml 안에 있음
 
 - hosts: aws # inventory 그룹 이름
   become: yes # sudo 권한으로 명령 실행
