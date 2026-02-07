@@ -12,7 +12,8 @@ resource "aws_security_group" "sg_7th_room" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["218.39.98.40/32"] # 관리자 IP만 허용
+    # cidr_blocks = ["218.39.98.40/32"] # 관리자 IP만 허용
+    cidr_blocks = ["0.0.0.0/0"] # CI/CD용
   }
 
   egress { # 아웃바운드                          
@@ -41,15 +42,15 @@ resource "aws_security_group" "web-sg" {
     to_port     = 80
     protocol    = "tcp"
     # cidr_blocks = ["10.0.0.0/16"] # 내부에서 오는 트래픽 허용? 기본 VPC랑 범위가 안맞음
-    # cidr_blocks = ["0.0.0.0/0"] # 실무에서는 외부 전체 허용이 표준
-    cidr_blocks = [data.aws_vpc.default.cidr_block] # VPC 내부 공격 시연 시 (실습용) - 외부 웹 서비스 불가
+    cidr_blocks = ["0.0.0.0/0"] # 실무에서는 외부 전체 허용이 표준
+    # cidr_blocks = [data.aws_vpc.default.cidr_block] # VPC 내부 공격 시연 시 (실습용) - 외부 웹 서비스 불가
   }
 
   ingress {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.default.cidr_block]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   # K3s API 서버
