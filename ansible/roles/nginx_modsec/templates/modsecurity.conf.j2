@@ -1,0 +1,13 @@
+# ModSecurity 기본 설정
+# SecRuleEngine On → blocking 모드
+SecRuleEngine On
+
+SecRequestBodyAccess On
+SecResponseBodyAccess Off
+SecRequestBodyLimit 13107200
+SecRequestBodyNoFilesLimit 131072
+SecRequestBodyInMemoryLimit 131072
+SecRequestBodyLimitAction Reject
+
+# 기본 CRS 규칙 포함
+IncludeOptional /usr/share/mod_security_crs/*.conf
