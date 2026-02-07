@@ -1,3 +1,5 @@
+# 원래는 k3s.yml이였던 것
+
 # EC2에 k3s 설치용 Ansible Playbook
 
 ---
