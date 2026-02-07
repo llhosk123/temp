@@ -20,7 +20,7 @@ data "aws_ami" "amazon_linux" {
 # terraform resource
 resource "aws_instance" "k3s_node" {
   ami           = data.aws_ami.amazon_linux.id
-  instance_type = "t3.micro"
+  instance_type = "t3.small"
   key_name      = "infra-dev-key"
 
   # public subnet 중 첫 번째에 배치
