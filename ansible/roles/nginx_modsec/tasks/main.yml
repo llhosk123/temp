@@ -1,4 +1,22 @@
 ---
+# 필수 패키지 설치 전 curl 안정화
+- name: Gather installed packages
+  ansible.builtin.package_facts:
+
+# Amazon Linux 2023에 curl-minimal이 이미 설치되어 있어 제거 후 curl 설치
+- name: Remove curl-minimal if exists
+  ansible.builtin.yum:
+    name: curl-minimal
+    state: absent
+  when: "'curl-minimal' in ansible_facts.packages"
+  ignore_errors: yes
+
+- name: Install curl if not installed
+  ansible.builtin.yum:
+    name: curl
+    state: present
+  when: "'curl' not in ansible_facts.packages"
+
 # 필수 패키지 설치
 - name: Install required packages
   dnf:
@@ -6,7 +24,6 @@
       - nginx
       - mod_security
       - mod_security_crs
-      - curl
     state: present
 
 # ModSecurity 활성화
