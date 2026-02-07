@@ -79,4 +79,5 @@ jobs:
         
       - name: Run k3s Playbook
         working-directory: ansible
-        run: ansible-playbook -i inventory.ini k3s.yml
+        # run: ansible-playbook -i inventory.ini k3s.yml
+        run: ansible-playbook -i inventory.ini site.yml
