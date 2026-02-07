@@ -1,1 +1,98 @@
+# Nginx Ingress Controller + WAF
+# k3s 환경 / Helm 기반
 
+---
+- name: Check helm exists
+  command: which helm
+  register: helm_check
+  ignore_errors: yes
+
+- name: Fail if helm is not installed
+  fail:
+    msg: "Helm is not installed. Install helm before running ingress_waf role."
+  when: helm_check.rc != 0
+
+
+# ingress-nginx Helm repo 추가
+- name: Add ingress-nginx helm repo
+  command: >
+    helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+  changed_when: false
+
+- name: Update helm repo
+  command: helm repo update
+  changed_when: false
+
+
+# Nginx Ingress Controller + ModSecurity + CRS 설치
+- name: Install Nginx Ingress Controller with ModSecurity WAF
+  command: >
+    helm upgrade --install nginx-waf ingress-nginx/ingress-nginx
+    --namespace ingress-nginx
+    --create-namespace
+    --kubeconfig /etc/rancher/k3s/k3s.yaml
+    --set controller.config.enable-modsecurity=true
+    --set controller.config.enable-owasp-modsecurity-crs=true
+    --set controller.kind=DaemonSet
+    --set controller.hostNetwork=true
+    --set controller.dnsPolicy=ClusterFirstWithHostNet
+    --set controller.service.type=ClusterIP
+    --set controller.admissionWebhooks.enabled=false
+  changed_when: false
+
+
+# 컨트롤러 기동 대기
+- name: Wait for ingress controller to be ready
+  command: sleep 30
+  changed_when: false
+
+
+# (선택) 테스트용 Self-Signed TLS Secret 생성
+- name: Create self-signed TLS secret for WAF test
+  shell: |
+    if [ ! -f /tmp/waf.key ]; then
+      openssl req -x509 -nodes -days 365 \
+        -newkey rsa:2048 \
+        -keyout /tmp/waf.key \
+        -out /tmp/waf.crt \
+        -subj "/CN=waf-test"
+    fi
+
+    kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml \
+      create secret tls waf-tls \
+      --cert=/tmp/waf.crt \
+      --key=/tmp/waf.key \
+      -n default \
+      --dry-run=client -o yaml | kubectl apply -f -
+  changed_when: false
+
+
+# (선택) 모든 트래픽을 WAF로 통과시키는 Catch‑all Ingress
+- name: Deploy WAF catch-all ingress rule
+  shell: |
+    cat <<EOF | kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml apply -f -
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      name: waf-gateway
+      annotations:
+        nginx.ingress.kubernetes.io/enable-modsecurity: "true"
+        nginx.ingress.kubernetes.io/enable-owasp-core-rules: "true"
+        nginx.ingress.kubernetes.io/modsecurity-snippet: |
+          SecRuleEngine On
+    spec:
+      ingressClassName: nginx
+      tls:
+      - secretName: waf-tls
+      rules:
+      - http:
+          paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: kubernetes
+                port:
+                  number: 443
+    EOF
+  changed_when: false
