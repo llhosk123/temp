@@ -21,6 +21,7 @@
         executable: /bin/bash
 
     - name: Check k3s status
-      shell: sudo systemctl status k3s
+      shell: systemctl is-active k3s
       register: k3s_status
-      failed_when: k3s_status.stdout != "active"
+      changed_when: false
+      failed_when: k3s_status.stdout.strip() != "active"
