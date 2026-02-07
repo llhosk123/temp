@@ -1,5 +1,5 @@
-# Nginx Ingress Controller + WAF
-# k3s 환경 / Helm 기반
+# Nginx Ingress Controller + WAF (k3s 환경 / Helm 기반)
+# 실무에서는 AWS WAF를 사용하지만 프리티어가 아닌 점 때문에 'WAF 개념을 직접 이해하는 것'에 초점을 두고 Ingress Controller + ModSecurity로 진행
 
 ---
 # Helm 존재 여부 체크
