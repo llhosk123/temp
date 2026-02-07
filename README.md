@@ -1,7 +1,7 @@
-### 트러블슈팅
+## 트러블슈팅
 [![Notion](https://img.shields.io/badge/Notion-black?style=for-the-badge&logo=notion&logoColor=white)](https://www.notion.so/300cd1e77d158071aab7da50eb155ad3)
 
-### Actions 성공 후 k3s active 확인 완료 (2026.02.07)
+## Actions 성공 후 k3s active 확인 완료 (2026.02.07)
 ```bash
 Windows PowerShell
 Copyright (C) Microsoft Corporation. All rights reserved.
