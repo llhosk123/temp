@@ -47,12 +47,20 @@
     group: root
     mode: '0644'
 
+# Nginx 메인 conf 수정: load_module 추가 (0208 04:02)
+- name: Ensure Nginx loads ModSecurity module
+  lineinfile:
+    path: /etc/nginx/nginx.conf
+    insertafter: '^user '
+    line: 'load_module modules/ngx_http_modsecurity_module.so;'
+    state: present
+
 # Nginx에 ModSecurity 연동
 - name: Enable ModSecurity in Nginx
   copy:
     dest: /etc/nginx/conf.d/modsecurity.conf
     content: |
-      load_module modules/ngx_http_modsecurity_module.so;
+      # load_module modules/ngx_http_modsecurity_module.so;
       modsecurity on;
       modsecurity_rules_file /etc/modsecurity/modsecurity.conf;
 
