@@ -53,6 +53,15 @@ resource "aws_security_group" "web-sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # K3s NodePort (myapi 서비스)
+  # K3s NodePort 규칙: 30000 ~ 32767 중 하나 사용 (쿠버가 정한 외부 입구)
+  ingress {
+    from_port   = 30001
+    to_port     = 30001
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # 외부 접속 허용 (학습용)
+  }
+
   # K3s API 서버
   ingress {
     from_port       = 6443
