@@ -26,10 +26,17 @@ spec:
             - containerPort: 3306 # MySQL 컨테이너 포트 3306 노출 -> API 파드가 연결 가능
           volumeMounts: 
             - name: mysql-init
-              mountPath: /docker-entrypoint-initdb.d
+            #  mountPath: /docker-entrypoint-initdb.d
+              mountPath: /docker-entrypoint-initdb.d/init.sql
+              subPath: init.sql
       volumes:
         - name: mysql-init
-          hostPath: # EC2 서버(노드) 기준 파일 경로
-            path: /home/ec2-user/my-project/myapp/db/init.sql # 호스트의 init.sql 파일을 컨테이너로 연결
-            type: File
+          configMap:
+            name: mysql-init-sql
+            items:
+              - key: init.sql
+                path: init.sql
+          #hostPath: # EC2 서버(노드) 기준 파일 경로
+          #  path: /home/ec2-user/my-project/myapp/db/init.sql # 호스트의 init.sql 파일을 컨테이너로 연결
+          #  type: File
 
