@@ -110,8 +110,8 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }} # kimsewon
+          password: ${{ secrets.DOCKERHUB_TOKEN }} # dckr_pat_ySTHVGwUyr3PVZnw01UePDktPJo
 
       - name: Build API Docker image
         run: |
