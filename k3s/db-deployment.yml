@@ -19,9 +19,9 @@ spec:
           image: mysql:8.0 # MySQL 공식 이미지 사용
           env: # 컨테이너 시작 시 환경 변수로 DB 초기 설정
             - name: MYSQL_ROOT_PASSWORD
-              value: "rootpassword" # root 계정 비밀번호
+              value: "root_pw" # root 계정 비밀번호
             - name: MYSQL_DATABASE
-              value: "mydb" # 초기 생성 DB 이름
+              value: "admin_db" # 초기 생성 DB 이름
           ports:
             - containerPort: 3306 # MySQL 컨테이너 포트 3306 노출 -> API 파드가 연결 가능
           volumeMounts: 
@@ -30,6 +30,6 @@ spec:
       volumes:
         - name: mysql-init
           hostPath: # EC2 서버(노드) 기준 파일 경로
-            path: /home/ubuntu/my-project/myapp/db/init.sql # 호스트의 init.sql 파일을 컨테이너로 연결
+            path: /home/ec2-user/my-project/myapp/db/init.sql # 호스트의 init.sql 파일을 컨테이너로 연결
             type: File
 
