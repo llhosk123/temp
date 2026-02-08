@@ -10,7 +10,7 @@
     # kubectl apply를 원격 서버에서 실행하려면 K3s 매니페스트 파일이 서버에 있어야 함
     - name: Copy K3s manifests to remote
       ansible.builtin.copy:
-        src: ./k3s/
+        src: ../k3s/
         dest: /home/ec2-user/my-project/k3s/ # 원격 EC2 서버 경로, 없으면 자동 생성
         mode: '0755'
 
