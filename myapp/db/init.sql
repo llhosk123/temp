@@ -8,7 +8,7 @@ CREATE TABLE admins (
 );
 
 INSERT INTO admins (admin_id, password_hash) VALUES
-('admin', SHA2('ad12@@3', 256)),
+('admin', SHA2('ad123@', 256)),
 ('master', SHA2('ma555#', 256)),
 ('leader', SHA2('ldr445!', 256)),
 ('security', SHA2('secu369@', 256)),
