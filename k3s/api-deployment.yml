@@ -22,7 +22,7 @@ spec:
             - containerPort: 5000 # 컨테이너가 노출할 포트
           env: # 환경 변수 설정: 컨테이너 안에서 K3s 클러스터 내 MySQL과 연결 가능하도록 함
             - name: DB_HOST
-              value: db
+              value: mysql
             - name: DB_USER
               value: root
             - name: DB_PASSWORD
