@@ -1,13 +1,15 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: myapi
-spec:
-  type: NodePort
-  selector:
-    app: myapi
-  ports:
-    - port: 5000
-      targetPort: 5000
-      nodePort: 30001
+# K3s 클러스터에서 API 파드를 외부 혹은 클러스터 내부에서 접근 가능하게 만드는 Service 정의 파일 (필수 매니페스트 파일)
+# -> Deployment만 있으면 파드는 생성되지만 외부에서 접근 불가
 
+apiVersion: v1 # Service 리소스 API 버전
+kind: Service # Service 리소스임을 선언
+metadata:
+  name: myapi # Service 이름 (Deployment와 연결될 수 있도록 고유 이름 지정)
+spec:
+  type: NodePort # 클러스터 노드의 포트를 외부로 열어 접근 가능 (ClusterIP: 클러스터 내부 전용 / LoadBalancer: 클라우드 LB 사용 가능)
+  selector: # 어떤 파드를 Service가 연결할지 선택
+    app: myapi # Deployment의 파드 레이블(app: myapi)과 반드시 일치해야 함
+  ports:
+    - port: 5000 # Service 내부에서 노출될 포트 (클러스터 내부 접근용)
+      targetPort: 5000 # 실제 파드 컨테이너 포트 (Deployment에서 지정한 5000)
+      nodePort: 30001 # 클러스터 노드에서 열릴 외부 포트 (외부에서 접속할 때 사용) -> 브라우저 접속 예시: http://<EC2_PUBLIC_IP>:30001
