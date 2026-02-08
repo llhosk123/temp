@@ -1,7 +1,7 @@
 # K3s 클러스터에 API 애플리케이션 배포 파일 (Deployment 매니페스트)
 
 apiVersion: apps/v1 # 쿠버네티스 API 버전
-kind: Deployment # 리소스 종류: Deployment → 파드 생성 및 관리
+kind: Deployment # 리소스 종류: Deployment -> 파드 생성 및 관리
 metadata:
   name: myapi # Deployment 이름
 spec:
