@@ -1,11 +1,11 @@
 from flask import Flask, request, render_template
 import mysql.connector
+import os
 
 app = Flask(__name__)
 
 def get_db_connection():
     return mysql.connector.connect(
-        return mysql.connector.connect(
         host=os.environ.get("DB_HOST", "db"),
         user=os.environ.get("DB_USER", "root"),
         password=os.environ.get("DB_PASSWORD", "root_pw"),
