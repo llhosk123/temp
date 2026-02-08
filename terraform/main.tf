@@ -21,7 +21,7 @@ data "aws_ami" "amazon_linux" {
 resource "aws_instance" "k3s_node" {
   ami           = data.aws_ami.amazon_linux.id
   instance_type = "t3.small"
-  key_name      = "infra-dev-key"
+  key_name      = "My_Key"
 
   # public subnet 중 첫 번째에 배치
   subnet_id = data.aws_subnets.public.ids[0]
