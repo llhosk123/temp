@@ -115,7 +115,7 @@ jobs:
 
       - name: Build API Docker image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/myapi:latest ./myapp
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/myapi:latest ./myapp/api
 
       - name: Push API Docker image
         run: |
