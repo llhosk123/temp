@@ -1,3 +1,5 @@
+# K3s클러스터에 MySQL 데이터베이스 배포 파일 (Deployment 매니페스트)
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -11,23 +13,23 @@ spec:
     metadata:
       labels:
         app: mysql
-    spec:
+    spec: # 파드 안에 실행될 컨테이너 정의
       containers:
         - name: mysql
-          image: mysql:8.0
-          env:
+          image: mysql:8.0 # MySQL 공식 이미지 사용
+          env: # 컨테이너 시작 시 환경 변수로 DB 초기 설정
             - name: MYSQL_ROOT_PASSWORD
-              value: "rootpassword"
+              value: "rootpassword" # root 계정 비밀번호
             - name: MYSQL_DATABASE
-              value: "mydb"
+              value: "mydb" # 초기 생성 DB 이름
           ports:
-            - containerPort: 3306
-          volumeMounts:
+            - containerPort: 3306 # MySQL 컨테이너 포트 3306 노출 -> API 파드가 연결 가능
+          volumeMounts: 
             - name: mysql-init
               mountPath: /docker-entrypoint-initdb.d
       volumes:
         - name: mysql-init
-          hostPath:
-            path: /home/ubuntu/my-project/myapp/db/init.sql
+          hostPath: # EC2 서버(노드) 기준 파일 경로
+            path: /home/ubuntu/my-project/myapp/db/init.sql # 호스트의 init.sql 파일을 컨테이너로 연결
             type: File
 
