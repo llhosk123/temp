@@ -1,29 +1,30 @@
-apiVersion: apps/v1
-kind: Deployment
+# K3s 클러스터에 API 애플리케이션 배포 파일 (파일 종류: Deployment 매니페스트)
+
+apiVersion: apps/v1 # 쿠버네티스 API 버전
+kind: Deployment # 리소스 종류: Deployment → 파드 생성 및 관리
 metadata:
-  name: myapi
+  name: myapi # Deployment 이름
 spec:
-  replicas: 1
+  replicas: 1 # 생성할 파드 수
   selector:
     matchLabels:
-      app: myapi
-  template:
+      app: myapi # 어떤 레이블을 가진 파드를 관리할지 지정
+  template: # Deployment가 생성할 파드 템플릿
     metadata:
       labels:
-        app: myapi
-    spec:
+        app: myapi # 레이블을 selector와 일치시켜야 Deployment가 관리 가능
+    spec: # 실제 컨테이너 정의
       containers:
         - name: myapi
-          image: myapi:latest  # Dockerfile로 빌드한 이미지
+          image: myapi:latest  # 사용할 Docker 이미지 (Dockerfile로 빌드)
           ports:
-            - containerPort: 5000
-          env:
+            - containerPort: 5000 # 컨테이너가 노출할 포트
+          env: # 환경 변수 설정: 컨테이너 안에서 K3s 클러스터 내 MySQL과 연결 가능하도록 함
             - name: DB_HOST
-              value: mysql
+              value: db
             - name: DB_USER
               value: root
             - name: DB_PASSWORD
-              value: rootpassword
+              value: root_pw
             - name: DB_NAME
-              value: mydb
-
+              value: admin_db
