@@ -1,1 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myapi
+  template:
+    metadata:
+      labels:
+        app: myapi
+    spec:
+      containers:
+        - name: myapi
+          image: myapi:latest  # Dockerfile로 빌드한 이미지
+          ports:
+            - containerPort: 5000
+          env:
+            - name: DB_HOST
+              value: mysql
+            - name: DB_USER
+              value: root
+            - name: DB_PASSWORD
+              value: rootpassword
+            - name: DB_NAME
+              value: mydb
 
